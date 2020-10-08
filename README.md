@@ -1,0 +1,1 @@
+# WayTodaySDK-Android
