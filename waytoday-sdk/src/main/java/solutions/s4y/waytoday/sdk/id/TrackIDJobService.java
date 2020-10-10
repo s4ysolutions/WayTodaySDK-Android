@@ -271,6 +271,7 @@ public class TrackIDJobService extends JobIntentService {
     /**
      * Enqueue the work unit requesting a new track id. The result will be send back
      * through ITrackIDChangeSeriviceListener. See @addOnTrackIDChangeListener
+     *
      * @param context a context used to create the intent to launch the service
      */
     @SuppressWarnings({"unused", "RedundantSuppression"})
@@ -283,11 +284,13 @@ public class TrackIDJobService extends JobIntentService {
     }
 
     private static final int sJobID = 1000;
+
     /**
      * Enqueue the work unit requesting a new track id. The result will be send back
      * through ITrackIDChangeSeriviceListener. See @addOnTrackIDChangeListener
+     *
      * @param context a context used to create the intent to launch the service
-     * @param prevID an id being used and needed to be released
+     * @param prevID  an id being used and needed to be released
      */
     public static void enqueueRetrieveId(Context context, String prevID) {
         if (!isProgress()) {
@@ -299,6 +302,7 @@ public class TrackIDJobService extends JobIntentService {
 
     /**
      * Subscribes listener to the responses on the request to retrieve new track id
+     *
      * @param listener the implementation of ITrackIDChangeServiceListener to handle
      *                 the notification
      */
@@ -308,6 +312,7 @@ public class TrackIDJobService extends JobIntentService {
 
     /**
      * Unsubscribes listener from the responses on the request to retrieve new track id
+     *
      * @param listener the implementation of ITrackIDChangeServiceListener used
      *                 in the previous call of addOnTrackIDChangeListener
      */

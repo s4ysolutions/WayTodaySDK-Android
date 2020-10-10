@@ -346,7 +346,7 @@ public class UploadJobService extends JobIntentService {
 
     private static void enqueueUploadLocations(Context context) {
         Intent intent = new Intent(context, UploadJobService.class);
-        enqueueWork(context, UploadJobService.class, 1000, intent);
+        enqueueWork(context, UploadJobService.class, 1001, intent);
     }
 
     private static void notifyUploadStatus() {
