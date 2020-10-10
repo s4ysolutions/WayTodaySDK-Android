@@ -208,16 +208,18 @@ package solutions.s4y.waytoday.sdk.errors;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import androidx.annotation.NonNull;
 
 public class ErrorsObservable {
     private static final List<IErrorListener> mIErrorListener =
             new ArrayList<>(2);
 
+    @SuppressWarnings({"unused", "RedundantSuppression"})
     public static void addErrorListener(IErrorListener listener) {
         mIErrorListener.add(listener);
     }
 
+    @SuppressWarnings({"unused", "RedundantSuppression"})
     public static void removeErrorListener(IErrorListener listener) {
         mIErrorListener.remove(listener);
     }
@@ -244,6 +246,7 @@ public class ErrorsObservable {
         notify(new ErrorNotification(throwable, toast));
     }
 
+    @SuppressWarnings({"unused", "RedundantSuppression"})
     public static void notify(String message, boolean toast) {
         notify(new ErrorNotification(message, toast));
     }
@@ -257,7 +260,7 @@ public class ErrorsObservable {
     }
 
     public interface IErrorListener {
-        void onError(@Nonnull final ErrorNotification errorNotification);
+        void onError(@NonNull final ErrorNotification errorNotification);
     }
 
 }
