@@ -263,7 +263,8 @@ public class Tracker {
                 if (BuildConfig.DEBUG) {
                     Log.d(LT, "kalmanFilter.predict: (location): east=" + Tracker.zero.getAbsEastAcc(declination) + " north=" + Tracker.zero.getAbsNorthAcc(declination) + " decl=" + declination);
                 }
-                mKalmanFilter.predict(Tracker.zero.getTimestamp(), Tracker.zero.getAbsEastAcc(declination), Tracker.zero.getAbsNorthAcc(declination));
+                long now = android.os.SystemClock.elapsedRealtimeNanos();
+                mKalmanFilter.predict(Utils.nano2milli(now), Tracker.zero.getAbsEastAcc(declination), Tracker.zero.getAbsNorthAcc(declination));
             }
         }
 
