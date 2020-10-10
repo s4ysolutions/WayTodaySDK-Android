@@ -7,7 +7,7 @@ plugins {
 }
 
 ext {
-   releaseVersion = System.getenv('RELEASE_VERSION') ?: '1.0.15'
+   releaseVersion = System.getenv('RELEASE_VERSION') ?: '1.0.16'
 }
 
 group 'solutions.s4y.waytoday.sdk'
@@ -125,11 +125,6 @@ afterEvaluate {
                 version = releaseVersion
 
                 from components.release
-                /*
-            artifact("$buildDir/outputs/aar/waytoday-sdk-release.aar") {
-                builtBy build
-            }
-             */
                 artifact sourceJar
                 artifact javadocJar
 

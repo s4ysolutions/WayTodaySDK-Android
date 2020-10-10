@@ -339,7 +339,7 @@ public class Tracker {
                 posDev = originalLocation.getAccuracy();
                 timeStamp = Utils.nano2milli(originalLocation.getElapsedRealtimeNanos());
                 mKalmanFilter = new GPSAccKalmanFilter(
-                        false, //todo move to settings
+                        true, //todo move to settings
                         Coordinates.longitudeToMeters(x),
                         Coordinates.latitudeToMeters(y),
                         xVel,
