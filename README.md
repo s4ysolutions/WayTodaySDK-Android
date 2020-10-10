@@ -1,12 +1,29 @@
 # WayTodaySDK for Android
 
+## Usage
+
+Add the library to the list of dependencies
+```
+    implementation  "solutions.s4y.waytoday:waytoday-sdk:1.0.15"
+```
+
+and make sure you have the following repositories in you app build.gradle
+```
+    jcenter()
+    mavenLocal()
+```
+
+Currently the 3rd party dependency `mad-location-manager:0.1.14` is not uploaded to a public repo and
+you have to clone the fork https://github.com/s4ysolutions/mad-location-manager and issue
+`./gradlew publishToMavenLocal`
+
+## Services
+
 WayToday SDK provides the services for requesting a personal track ID and upload the locations received
 from Android services to WayToday server.
 
 Besides the services there's a helper package to wrap Android GPS provider with the convenient
 methods and and listeners
-
-## Services
 
 ### IDJobService
 
