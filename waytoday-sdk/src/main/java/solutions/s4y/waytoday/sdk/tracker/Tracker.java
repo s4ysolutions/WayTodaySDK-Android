@@ -8,7 +8,7 @@
  *    1. Definitions.
  *
  *       "License" shall mean the terms and conditions for use, reproduction,
- *       and distribution as defined by Sections 1 through 9 of this document.
+ *       and distribution as defined by Secaions 1 through 9 of this document.
  *
  *       "Licensor" shall mean the copyright owner or entity authorized by
  *       the copyright owner that is granting the License.
@@ -205,13 +205,17 @@
 
 package solutions.s4y.waytoday.sdk.tracker;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
+import androidx.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -221,8 +225,14 @@ import mad.location.manager.lib.Commons.GeoPoint;
 import mad.location.manager.lib.Commons.Utils;
 import mad.location.manager.lib.Filters.GPSAccKalmanFilter;
 import solutions.s4y.waytoday.sdk.BuildConfig;
+import solutions.s4y.waytoday.sdk.errors.ErrorsObservable;
+import solutions.s4y.waytoday.sdk.id.ITrackIDChangeListener;
+import solutions.s4y.waytoday.sdk.id.TrackIDJobService;
 import solutions.s4y.waytoday.sdk.locations.ILocationUpdater;
 import solutions.s4y.waytoday.sdk.locations.IRequestListener;
+import solutions.s4y.waytoday.sdk.upload.UploadJobNotInitializedException;
+import solutions.s4y.waytoday.sdk.upload.UploadJobService;
+import solutions.s4y.waytoday.sdk.watchdog.Watchdog;
 
 /**
  * The class to manage state of LocationUpdater, post-process the location updates
@@ -232,7 +242,7 @@ import solutions.s4y.waytoday.sdk.locations.IRequestListener;
 public class Tracker {
     private static final String LT = Tracker.class.getSimpleName();
 
-    private final List<ILocationListener> locationListeners =
+    private final List<ILocationListener> filterdLocationListeners =
             new ArrayList<>(2);
 
     @VisibleForTesting
@@ -251,31 +261,30 @@ public class Tracker {
     double prevLat = 0;
     double prevLon = 0;
     private final LocationListener locationListener = new LocationListener() {
+
         private void handlePredict() {
             DataItemGPS gps = lastDataItemGPS;
             if (gps.location == null) {
                 if (BuildConfig.DEBUG) {
-                    Log.d(LT, "kalmanFilter.predict (no location): east=" + Tracker.zero.absEastAcc + " north=" + Tracker.zero.absNorthAcc);
+                    Log.d(LT, "locationListener kalmanFilter.predict (no location): east=" + Tracker.zero.absEastAcc + " north=" + Tracker.zero.absNorthAcc);
                 }
                 mKalmanFilter.predict(Tracker.zero.getTimestamp(), Tracker.zero.absEastAcc, Tracker.zero.absNorthAcc);
             } else {
                 double declination = gps.getDeclination();
                 if (BuildConfig.DEBUG) {
-                    Log.d(LT, "kalmanFilter.predict: (location): east=" + Tracker.zero.getAbsEastAcc(declination) + " north=" + Tracker.zero.getAbsNorthAcc(declination) + " decl=" + declination);
+                    Log.d(LT, "locationListener kalmanFilter.predict: (location): east=" + Tracker.zero.getAbsEastAcc(declination) + " north=" + Tracker.zero.getAbsNorthAcc(declination) + " decl=" + declination);
                 }
                 long now = android.os.SystemClock.elapsedRealtimeNanos();
                 mKalmanFilter.predict(Utils.nano2milli(now), Tracker.zero.getAbsEastAcc(declination), Tracker.zero.getAbsNorthAcc(declination));
             }
         }
 
-        private void handleUpdate(DataItemGPS gps, Location location) {
+        private void handleUpdate(@NonNull DataItemGPS gps, @NonNull Location location) {
             double xVel = location.getSpeed() * Math.cos(location.getBearing());
             double yVel = location.getSpeed() * Math.sin(location.getBearing());
 
             if (BuildConfig.DEBUG) {
-                if (gps.location != null) {
-                    Log.d(LT, "kalmanFilter.update: lon=" + gps.location.getLongitude() + " lat=" + gps.location.getLatitude() + " xVel=" + xVel + " yVel=" + yVel);
-                }
+                Log.d(LT, "locationListener kalmanFilter.update: lon=" + location.getLongitude() + " lat=" + location.getLatitude() + " xVel=" + xVel + " yVel=" + yVel);
             }
 
             mKalmanFilter.update(
@@ -315,12 +324,13 @@ public class Tracker {
 
         @Override
         public void onLocationChanged(@androidx.annotation.NonNull Location originalLocation) {
-            if (BuildConfig.DEBUG) {
-                Log.d(LT, "onLocationChanged");
-            }
 
             double lat = originalLocation.getLatitude();
             double lon = originalLocation.getLongitude();
+
+            if (BuildConfig.DEBUG) {
+                Log.d(LT, "onLocationChanged lon=" + lon + " lat=" + lat);
+            }
 
             if (lat == 0 || lon == 0) {
                 return;
@@ -328,6 +338,9 @@ public class Tracker {
 
             lastDataItemGPS = new DataItemGPS(originalLocation);
             if (mKalmanFilter == null) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(LT, "create new Kalman");
+                }
                 double x, y, xVel, yVel, posDev, course, speed;
                 long timeStamp;
                 speed = originalLocation.getSpeed();
@@ -353,6 +366,9 @@ public class Tracker {
             }
             double ts = lastDataItemGPS.getTimestamp();
             if (ts < lastGPSTimeStamp) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(LT, "skip update from the past");
+                }
                 return;
             }
             lastGPSTimeStamp = ts;
@@ -376,7 +392,7 @@ public class Tracker {
 
             prevLon = lon;
             prevLat = lat;
-            notifyLocation(location);
+            notifyFilteredLocation(location);
         }
 
         @Override
@@ -413,39 +429,98 @@ public class Tracker {
         }
     };
 
-    private ILocationUpdater updater;
+    public ILocationUpdater locationUpdater;
 
     public boolean isSuspended;
     public boolean isUpdating;
+    public Watchdog watchdog = new Watchdog();
 
-    @SuppressWarnings({"unused", "RedundantSuppression"})
-    public void requestStart(@NonNull final ILocationUpdater updater, int frequency) {
-        if (BuildConfig.DEBUG) {
-            Log.d(LT, "requestStart");
-        }
-        stop();
-        this.updater = updater;
-        isUpdating = true;
-        isSuspended = false;
-        minDistance = frequency < 5000 ? 0 : frequency < 15000 ? 0.0002f : 0.0005f;
+    private ILocationListener filteredLocationListener;
 
-        notifyStateChange();
-        updater.requestLocationUpdates(locationListener, requestListener, frequency);
+    public Tracker(String secret, String provider) {
+        UploadJobService.init(secret, provider);
+        TrackIDJobService.init(secret);
     }
 
     @SuppressWarnings({"unused", "RedundantSuppression"})
-    public void stop() {
+    public void requestStart(@NonNull Context context, @NonNull final ILocationUpdater locationUpdater) {
+        if (BuildConfig.DEBUG) {
+            Log.d(LT, "requestStart");
+        }
+        stop(context);
+        setOn(context, true);
+        this.locationUpdater = locationUpdater;
+        isUpdating = true;
+        isSuspended = false;
+        if (!TrackIDJobService.hasTid(context)) {
+            if (BuildConfig.DEBUG) Log.d(LT, "will request tid");
+            final ITrackIDChangeListener listener = new ITrackIDChangeListener() {
+                @Override
+                public void onTrackID(@NonNull String trackID) {
+                    TrackIDJobService.removeOnTrackIDChangeListener(this);
+                    if (BuildConfig.DEBUG) Log.d(LT, "got new tid=" + trackID);
+                    if (!"".equals(trackID)) {
+                        if (BuildConfig.DEBUG) Log.d(LT, "will request start after new tid");
+                        new Handler(context.getMainLooper()).post(() ->
+                                requestStart(context, locationUpdater));
+                    }
+                }
+            };
+            TrackIDJobService.addOnTrackIDChangeListener(listener);
+            TrackIDJobService.enqueueRetrieveId(context, "");
+        } else {
+            if (BuildConfig.DEBUG) Log.d(LT, "will request start immediately");
+        }
+        int frequency = frequencyMs(context);
+        minDistance = frequency < 5000 ? 0 : frequency < 15000 ? 0.0002f : 0.0005f;
+
+        notifyStateChange();
+        locationUpdater.requestLocationUpdates(locationListener, requestListener, frequency);
+        watchdog.start(context, Math.max(frequency * 2, 60 * 1000), () -> {
+            if (UploadJobService.hasLocations()) {
+                try {
+                    UploadJobService.enqueueUploadLocations(context);
+                } catch (UploadJobNotInitializedException e) {
+                    e.printStackTrace();
+                    ErrorsObservable.notify(e);
+                }
+            }
+        });
+        filteredLocationListener = location -> {
+            try {
+                UploadJobService.enqueueUploadLocation(context, location);
+            } catch (UploadJobNotInitializedException e) {
+                e.printStackTrace();
+                ErrorsObservable.notify(e);
+            }
+        };
+        filterdLocationListeners.add(filteredLocationListener);
+    }
+
+    @SuppressWarnings({"unused", "RedundantSuppression"})
+    public void stop(Context context) {
+        setOn(context, false);
         if (BuildConfig.DEBUG) {
             Log.d(LT, "stop");
         }
-        if (updater != null) {
-            updater.cancelLocationUpdates();
-            updater = null;
+        if (UploadJobService.hasLocations()) {
+            try {
+                UploadJobService.enqueueUploadLocations(context);
+            } catch (UploadJobNotInitializedException e) {
+                e.printStackTrace();
+                ErrorsObservable.notify(e);
+            }
+        }
+        if (locationUpdater != null) {
+            locationUpdater.cancelLocationUpdates();
+            locationUpdater = null;
         }
         if (isUpdating) {
             isUpdating = false;
             notifyStateChange();
         }
+        filterdLocationListeners.remove(filteredLocationListener);
+        watchdog.stop(context);
     }
 
     @SuppressWarnings({"unused", "RedundantSuppression"})
@@ -457,17 +532,39 @@ public class Tracker {
     }
 
     @SuppressWarnings({"unused", "RedundantSuppression"})
-    public void addOnLocationListener(ILocationListener listener) {
-        locationListeners.add(listener);
+    public boolean isOn(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getBoolean("solutions.s4y.waytoday.sdk.on", false);
+    }
+
+    private void setOn(Context context, boolean on) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preferences.edit().putBoolean("solutions.s4y.waytoday.sdk.on", on).apply();
+    }
+
+    public int frequencyMs(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getInt("solutions.s4y.waytoday.sdk.fr", 0);
     }
 
     @SuppressWarnings({"unused", "RedundantSuppression"})
-    public void removeOnLocationListener(ILocationListener listener) {
-        locationListeners.remove(listener);
+    public void setFrequencyMs(Context context, int freq) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preferences.edit().putInt("solutions.s4y.waytoday.sdk.fr", freq).apply();
     }
 
-    private void notifyLocation(@NonNull Location location) {
-        for (ILocationListener listener : locationListeners) {
+    @SuppressWarnings({"unused", "RedundantSuppression"})
+    public void addOnFilteredLocationListener(ILocationListener listener) {
+        filterdLocationListeners.add(listener);
+    }
+
+    @SuppressWarnings({"unused", "RedundantSuppression"})
+    public void removeOnFilteredLocationListener(ILocationListener listener) {
+        filterdLocationListeners.remove(listener);
+    }
+
+    private void notifyFilteredLocation(@NonNull Location location) {
+        for (ILocationListener listener : filterdLocationListeners) {
             listener.onLocation(location);
         }
     }

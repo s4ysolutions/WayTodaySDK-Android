@@ -205,6 +205,13 @@
   -->
 
 <resources>
-    <string name="app_name">Way.Today</string>
     <string name="no_location_manager">На устройстве отсутсвует GPS</string>
+    <string name="request_ignore_battery_optimization">Андроид ограничивает работу сети при выключенном экране. Чтобы отправлять изменения чаще, чем раз в 15 минут, необходимо отключить оптимизацию использования батареи для этого приложения.</string>
+    <string name="request_ignore_battery_optimization_cancel">Оправлять позицию на карте не чаще, чем возможно</string>
+    <string name="request_ignore_battery_optimization_ok">Открыть настройки использования батареи</string>
+    <string name="request_ignore_battery_optimization_title">Предупреждение об использовании батареи</string>
+    <string name="request_permission_title">Разрешить доступ к GPS</string>
+    <string name="request_location_permission">WayToday дает возможность каждому, кто знает ваш код видеть на сайте https:/way.today 500 последних локаций в течении 2х недель или, до смены кода.</string>
+    <string name="request_permission_ok">Разрешить слежение</string>
+    <string name="request_location_cancel">Не разрешать GPS</string>
 </resources>

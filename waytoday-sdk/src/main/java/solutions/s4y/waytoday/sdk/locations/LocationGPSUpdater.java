@@ -225,7 +225,6 @@ import solutions.s4y.waytoday.sdk.tracker.Tracker;
  * completed
  */
 
-
 @SuppressWarnings({"unused", "RedundantSuppression"})
 public class LocationGPSUpdater implements ILocationUpdater {
     private static final String LT = Tracker.class.getSimpleName();
@@ -247,12 +246,12 @@ public class LocationGPSUpdater implements ILocationUpdater {
             @NonNull IRequestListener requestLocationsUpdatesListener,
             int frequency
     ) {
+        if (BuildConfig.DEBUG) {
+            Log.d(LT, "requestLocationUpdates " + frequency + " ms" + " manager " + (locationManager != null));
+        }
         if (locationManager == null) {
             ErrorsObservable.toast(R.string.no_location_manager);
             return;
-        }
-        if (BuildConfig.DEBUG) {
-            Log.d(LT, "requestLocationUpdates " + frequency + " ms");
         }
         if (this.locationListener != null) {
             cancelLocationUpdates();
@@ -278,6 +277,9 @@ public class LocationGPSUpdater implements ILocationUpdater {
 
     @Override
     public void cancelLocationUpdates() {
+        if (BuildConfig.DEBUG) {
+            Log.d(LT, "cancelLocationUpdates manager " + (locationManager != null));
+        }
         if (locationManager == null) {
             ErrorsObservable.toast(R.string.no_location_manager);
             return;

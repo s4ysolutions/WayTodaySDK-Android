@@ -1,5 +1,9 @@
 # WayTodaySDK for Android
 
+   is not up to date!
+   see https://github.com/s4ysolutions/itag for real life sample
+   the class Waytoday, and methods MainActivity.onResume/onPause are keys
+
 ## Usage
 
 Add the library to the list of dependencies

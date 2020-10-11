@@ -205,6 +205,13 @@
   -->
 
 <resources>
-    <string name="app_name">Way.Today</string>
     <string name="no_location_manager">لا يوجد GPS على هذا الجهاز</string>
+    <string name="request_ignore_battery_optimization">يحد Android من نشاط الشبكة أثناء إيقاف تشغيل الشاشة. لإرسال التحديث أكثر من مرة في 15 دقيقة ، يلزمك تعطيل تحسين البطارية لهذا التطبيق.</string>
+    <string name="request_ignore_battery_optimization_cancel">أرسل التحديثات كلما أمكن ذلك</string>
+    <string name="request_ignore_battery_optimization_ok">افتح إعدادات تحسين البطارية</string>
+    <string name="request_ignore_battery_optimization_title">تحذير استخدام البطارية</string>
+    <string name="request_permission_title">السماح بالوصول إلى موقع GPS</string>
+    <string name="request_location_permission">يسمح WayToday لأي شخص يعرف الكود برؤية آخر 500 مكان على https://way.today بينما الرمز هو نفسه لمدة تصل إلى أسبوعين</string>
+    <string name="request_permission_ok">السماح بتتبع GPS</string>
+    <string name="request_location_cancel">لا تتبع</string>
 </resources>

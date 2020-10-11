@@ -204,6 +204,13 @@
   -->
 
 <resources>
-    <string name="app_name">Way.Today</string>
     <string name="no_location_manager">There\'s no GPS on this device</string>
+    <string name="request_ignore_battery_optimization">Android limits the network activity while screen is off. In order to send the updated more than once in 15 minutes you need to disable battery optimization for this application.</string>
+    <string name="request_ignore_battery_optimization_cancel">Send location updates as often as possible</string>
+    <string name="request_ignore_battery_optimization_ok">Open battery optimization settings</string>
+    <string name="request_ignore_battery_optimization_title">Battery usage warning</string>
+    <string name="request_permission_title">Allow access GPS position</string>
+    <string name="request_location_permission">WayToday allows anybody who knows your ID to see the last 500 locations on the site https://way.today for 2 weeks or until the ID changed</string>
+    <string name="request_permission_ok">Allow GPS tracking</string>
+    <string name="request_location_cancel">Don\'t track</string>
 </resources>

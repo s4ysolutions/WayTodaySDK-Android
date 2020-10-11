@@ -213,7 +213,9 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
-import android.preference.PreferenceManager;
+import android.util.Log;
+
+import androidx.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -244,6 +246,7 @@ import static java.util.UUID.randomUUID;
  * Ready for use JobIntentService to upload the locations to the WayToday server
  */
 public class UploadJobService extends JobIntentService {
+    private static final String LT = UploadJobService.class.getSimpleName();
     private static String secret;
     private static String provider;
 
@@ -336,7 +339,7 @@ public class UploadJobService extends JobIntentService {
      * @param location - a GPS location too be added to the queue
      */
     @SuppressWarnings({"unused", "RedundantSuppression"})
-    public static void enqueueUploadLocation(Context context, Location location) {
+    public static void enqueueUploadLocation(Context context, Location location) throws UploadJobNotInitializedException {
         synchronized (uploadQueue) {
             uploadQueue.add(location);
         }
@@ -344,9 +347,21 @@ public class UploadJobService extends JobIntentService {
         enqueueUploadLocations(context);
     }
 
-    private static void enqueueUploadLocations(Context context) {
+    public static void enqueueUploadLocations(Context context) throws UploadJobNotInitializedException {
+        if (secret == null) {
+            throw new UploadJobNotInitializedException();
+        }
+        if (BuildConfig.DEBUG) {
+            synchronized (uploadQueue) {
+                Log.d(LT, "enqueueUploadLocations sent intent size= " + uploadQueue.size());
+            }
+        }
         Intent intent = new Intent(context, UploadJobService.class);
         enqueueWork(context, UploadJobService.class, 1001, intent);
+    }
+
+    public static boolean hasLocations() {
+        return uploadQueue.size() > 0;
     }
 
     private static void notifyUploadStatus() {
@@ -389,6 +404,9 @@ public class UploadJobService extends JobIntentService {
 
     @VisibleForTesting()
     public void destroyGrpcChannel() {
+        if (BuildConfig.DEBUG) {
+            Log.d(LT, "destroyGrpcChannel ch " + (ch == null ? "is null" : "is not null"));
+        }
         if (ch != null) {
             try {
                 ch.shutdown().awaitTermination(5, TimeUnit.SECONDS);
@@ -401,6 +419,9 @@ public class UploadJobService extends JobIntentService {
 
     @Override
     public void onDestroy() {
+        if (BuildConfig.DEBUG) {
+            Log.d(LT, "onDestroy");
+        }
         destroyGrpcChannel();
         super.onDestroy();
     }
@@ -415,6 +436,9 @@ public class UploadJobService extends JobIntentService {
         the oldest locations from the queue
         */
         synchronized (uploadQueue) {
+            if (BuildConfig.DEBUG) {
+                Log.d(LT, "saveQueueToStore size=" + uploadQueue.size());
+            }
             while (uploadQueue.size() > MAX_LOCATIONS_MEMORY) {
                 uploadQueue.pollFirst();
             }
@@ -424,7 +448,9 @@ public class UploadJobService extends JobIntentService {
     private boolean uploadQueue(@NonNull final String tid) {
         List<Location> pack = new ArrayList<>();
         boolean completed = false;
-
+        if (BuildConfig.DEBUG) {
+            Log.d(LT, "uploadQueue");
+        }
         for (; ; ) {
             pack.clear();
             int packSize;
@@ -436,6 +462,9 @@ public class UploadJobService extends JobIntentService {
                         pack.add(head);
                     }
                 }
+            }
+            if (BuildConfig.DEBUG) {
+                Log.d(LT, "pack.size=" + pack.size());
             }
             if (pack.size() > 0) {
                 TrackerOuterClass.AddLocationsRequest.Builder req =
@@ -514,7 +543,7 @@ public class UploadJobService extends JobIntentService {
                 .setSid(randomUUID().toString())
                 .setSpeed(i(location.getSpeed()))
                 .setTid(tid)
-                .setTs(System.currentTimeMillis() / 1000)
+                .setTs(location.getTime())
                 .build();
     }
 
@@ -526,7 +555,11 @@ public class UploadJobService extends JobIntentService {
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String tid = preferences.getString("tid", "");
+        String tid = preferences.getString("solutions.s4y.waytoday.sdk.tid", "");
+
+        if (BuildConfig.DEBUG) {
+            Log.d(LT, "handleWork tid=" + tid + " isUploading=" + sIsUploading + " isError" + sIsError);
+        }
 
         if ("".equals(tid)) return;
 
@@ -534,13 +567,20 @@ public class UploadJobService extends JobIntentService {
             ErrorsObservable.notify(new Error("UploadJobService re-entry"), BuildConfig.DEBUG);
         }
         sIsUploading = true;
-        if (uploadQueue.size() > 0) {
+        int size;
+        synchronized (uploadQueue) {
+            size = uploadQueue.size();
+        }
+        if (size > 0) {
             sIsError = false;
 
             notifyUpdateState();
 
             boolean completed = false;
             if (isConnected()) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(LT, "connected");
+                }
                 uploadStore();
                 completed = uploadQueue(tid);
             }
