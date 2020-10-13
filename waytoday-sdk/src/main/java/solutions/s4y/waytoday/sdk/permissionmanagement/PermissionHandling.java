@@ -211,29 +211,37 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+
 import solutions.s4y.waytoday.sdk.R;
 import solutions.s4y.waytoday.sdk.locations.ILocationUpdater;
 import solutions.s4y.waytoday.sdk.tracker.Tracker;
 
 @SuppressWarnings({"unused", "RedundantSuppression"})
 public class PermissionHandling {
-    private static final int REQUEST_ENABLE_LOCATION = 1;
+    private static final int REQUEST_ENABLE_LOCATION = 22031971;
+
+    public static boolean needPermissionRequest(Context context) {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
+    }
 
     public static void requestPermissions(Activity activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                if (activity.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setMessage(R.string.request_location_permission)
-                            .setTitle(R.string.request_permission_title)
-                            .setPositiveButton(android.R.string.ok,
-                                    (dialog, which)
-                                            -> activity.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_ENABLE_LOCATION))
-                            .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.cancel())
-                            .show();
-                } else {
-                    activity.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_ENABLE_LOCATION);
-                }
+       requestPermissions(activity, R.string.request_location_permission);
+    }
+
+    public static void requestPermissions(Activity activity, int message) {
+        if (needPermissionRequest(activity)) {
+            if (activity.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setMessage(message)
+                        .setTitle(R.string.request_permission_title)
+                        .setPositiveButton(android.R.string.ok,
+                                (dialog, which)
+                                        -> activity.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_ENABLE_LOCATION))
+                        .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.cancel())
+                        .show();
+            } else {
+                activity.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_ENABLE_LOCATION);
             }
         }
     }
