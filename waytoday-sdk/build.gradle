@@ -117,7 +117,7 @@ protobuf {
     }
 }
 
-afterEvaluate {
+project.afterEvaluate {
     publishing {
         publications {
             WayTodaySDKPublication(MavenPublication) {
