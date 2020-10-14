@@ -54,7 +54,7 @@ dependencies {
     implementation 'io.grpc:grpc-protobuf-lite:1.32.1'
     implementation 'io.grpc:grpc-stub:1.32.1'
     implementation 'io.grpc:grpc-okhttp:1.32.1'
-    api 'com.maddevsio.mad-location-manager:mad-location-manager:0.1.14'
+    api 'solutions.s4y.mad-location-manager:mad-location-manager:0.1.14'
 
     testImplementation 'androidx.test.ext:junit:1.1.2'
     testImplementation 'com.google.truth:truth:1.0.1'
