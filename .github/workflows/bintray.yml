@@ -3,6 +3,7 @@ on:
   release:
     types: [published, edited]
 jobs:
+  if: ${{ false }}
   bintray:
     runs-on: ubuntu-latest
     steps:
