@@ -2,24 +2,12 @@
 
    is not up to date!
    see https://github.com/s4ysolutions/itag for real life sample
-   the class Waytoday, and methods MainActivity.onResume/onPause are keys
+   the class Waytoday, and methods MainActivity.onResume/onPause
 
 ## Usage
 
 Add the library to the list of dependencies
-```
-    implementation  "solutions.s4y.waytoday:waytoday-sdk:1.0.15"
-```
-
-and make sure you have the following repositories in you app build.gradle
-```
-    jcenter()
-    mavenLocal()
-```
-
-Currently the 3rd party dependency `mad-location-manager:0.1.14` is not uploaded to a public repo and
-you have to clone the fork https://github.com/s4ysolutions/mad-location-manager and issue
-`./gradlew publishToMavenLocal`
+[![Release](https://jitpack.io/v/s4ysolutions/WayTodaySDK-Android.svg)](https://jitpack.io/#s4ysolutions/WayTodaySDK-Android)
 
 ## Services
 
@@ -61,7 +49,6 @@ tracker id and to subscribe on the response(s).
 ```
 
 ## GPS Helpers
-It is not necessary to utilize the classes below, one can use any location source available.
 
 ### Location updaters
 

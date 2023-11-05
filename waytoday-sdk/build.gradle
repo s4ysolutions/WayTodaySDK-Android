@@ -13,7 +13,7 @@ android {
 }
 
 ext {
-    releaseVersion = System.getenv('RELEASE_VERSION') ?: '1.0.33'
+    releaseVersion = System.getenv('RELEASE_VERSION') ?: '1.0.36'
 }
 
 group 'solutions.s4y.waytoday.sdk'
