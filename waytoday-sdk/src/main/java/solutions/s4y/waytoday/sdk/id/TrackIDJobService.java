@@ -224,8 +224,8 @@ import java.util.concurrent.TimeUnit;
 
 import io.grpc.ManagedChannel;
 import solutions.s4y.waytoday.sdk.errors.ErrorsObservable;
-import solutions.s4y.waytoday.sdk.grpc.TrackerGrpc;
-import solutions.s4y.waytoday.sdk.grpc.TrackerOuterClass;
+import solutions.s4y.waytoday.grpc.TrackerGrpc;
+import solutions.s4y.waytoday.grpc.TrackerOuterClass;
 import solutions.s4y.waytoday.sdk.grpc.GRPCChannelProvider;
 
 /**
