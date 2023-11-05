@@ -1,12 +1,8 @@
 plugins {
     id 'com.android.library'
     id 'com.google.protobuf' version '0.9.4'
-    // id 'com.android.library' version '8.1.2'
-    /*
     id 'maven-publish'
-    id 'signing'
-    id 'com.google.protobuf' version '0.9.4'
-     */
+    // id 'signing'
 }
 
 android {
@@ -17,7 +13,7 @@ android {
 }
 
 ext {
-    releaseVersion = System.getenv('RELEASE_VERSION') ?: '1.0.32'
+    releaseVersion = System.getenv('RELEASE_VERSION') ?: '1.0.33'
 }
 
 group 'solutions.s4y.waytoday.sdk'
@@ -55,6 +51,12 @@ android {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 }
 
 dependencies {
@@ -73,38 +75,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
-
-/*
-task sourceJar(type: Jar) {
-    archiveClassifier = 'sources'
-    from android.sourceSets.main.java.srcDirs
-}
-
-tasks.withType(Javadoc) {
-    options.addStringOption('Xdoclint:none', '-quiet')
-}
- */
-/*
-task androidJavadocs(type: Javadoc, dependsOn: build) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    android.libraryVariants.all { variant ->
-        if (variant.name == 'release') {
-            owner.classpath += variant.javaCompileProvider.get().classpath
-        }
-        source += [file("$buildDir/generated/source/proto/$variant.name/grpc"),
-                   file("$buildDir/generated/source/proto/$variant.name/java"),
-                   file("$buildDir/generated/source/buildConfig/$variant.name")]
-    }
-    exclude '** /R.html', '** /R.*.html', '** /index.html'
-}
-*/
-/*
-task javadocJar(type: Jar, dependsOn: androidJavadocs) {
-    archiveClassifier.set('javadoc')
-    from androidJavadocs.destinationDir
-}
-*/
 
 protobuf {
     protoc {
@@ -129,75 +99,51 @@ protobuf {
     }
 }
 
-/*
-project.afterEvaluate {
-    publishing {
-        publications {
-            WayTodaySDKPublication(MavenPublication) {
-                groupId = 'solutions.s4y.waytoday'
-                artifactId = 'waytoday-sdk'
-                version = releaseVersion
+task javaSourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from android.sourceSets.main.java.srcDirs
 
-                from components.release
-                artifact sourceJar
-//                artifact javadocJar
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
 
-                pom {
-                    packaging 'aar'
-                    name = 'WayToday SDK for Android'
-                    description = 'Android GPS tracker, WayToday ID and Upload services'
-                    url = 'https://github.com/s4ysolutions/WayTodaySDK-Android'
-                    licenses {
-                        license {
-                            name = 'Apache License 2.0'
-                            url = 'https://github.com/s4ysolutions/WayTodaySDK-Android/blob/main/LICENSE'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = 'dsame'
-                            name = 'Sergey Dolin'
-                            email = 'sergey@s4y.solutions'
-                        }
-                    }
-                    scm {
-                        connection = 'scm:git:git://github.com/s4ysolutions/WayTodaySDK-Android.git'
-                        developerConnection = 'scm:git:ssh://github.com/s4ysolutions/WayTodaySDK-Android.git'
-                        url = 'https://github.com/s4ysolutions/WayTodaySDK-Android'
+publishing {
+    publications {
+        Release(MavenPublication) {
+            groupId = 'solutions.s4y.waytoday'
+            artifactId = 'waytoday-sdk'
+            version = releaseVersion
+
+            pom {
+                packaging 'aar'
+                name = 'WayToday SDK for Android'
+                description = 'Android GPS tracker, WayToday ID and Upload services'
+                url = 'https://github.com/s4ysolutions/WayTodaySDK-Android'
+                licenses {
+                    license {
+                        name = 'Apache License 2.0'
+                        url = 'https://github.com/s4ysolutions/WayTodaySDK-Android/blob/main/LICENSE'
                     }
                 }
+                developers {
+                    developer {
+                        id = 'dsame'
+                        name = 'Sergey Dolin'
+                        email = 'sergey@s4y.solutions'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/s4ysolutions/WayTodaySDK-Android.git'
+                    developerConnection = 'scm:git:ssh://github.com/s4ysolutions/WayTodaySDK-Android.git'
+                    url = 'https://github.com/s4ysolutions/WayTodaySDK-Android'
+                }
+            }
+
+            afterEvaluate {
+                from components.release
+                //               artifact sourceJar
+//                artifact javadocJar
             }
         }
     }
 }
-*/
-/*
-bintray {
-    dryRun = false
-    publish = true
-    override = true
-    user = System.getenv('BINTRAY_USER') ?: bintrayUser
-    key = System.getenv('BINTRAY_KEY') ?: bintrayKey
-    publications = ['WayTodaySDKPublication']
-
-    pkg {
-        repo = 'maven'
-        name = 'waytoday-sdk'
-        userOrg = 's4ysolutions'
-        description = 'Android GPS tracker, WayToday ID and Upload services'
-        publications = ['WayTodaySDKPublication']
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/s4ysolutions/WayTodaySDK-Android.git'
-        websiteUrl = 'https://github.com/s4ysolutions/WayTodaySDK-Android.git'
-        issueTrackerUrl = 'https://github.com/s4ysolutions/WayTodaySDK-Android/issues'
-        githubRepo = 's4ysolutions/WayTodaySDK-Android'
-        githubReleaseNotesFile = 'README.md'
-        version {
-            name = releaseVersion
-            desc = 'WayToday SDK for Android v' + releaseVersion
-            released = new Date()
-            vcsTag = releaseVersion
-        }
-    }
-}
- */
