@@ -373,26 +373,29 @@ public class Tracker {
             }
             lastGPSTimeStamp = ts;
 
-            handleUpdate(lastDataItemGPS, lastDataItemGPS.location);
-            Location location = locationAfterUpdateStep(lastDataItemGPS.location);
+            Location lastDataItemGPSLocation = lastDataItemGPS.location;
+            if (lastDataItemGPSLocation != null) {
+                handleUpdate(lastDataItemGPS, lastDataItemGPSLocation);
+                Location location = locationAfterUpdateStep(lastDataItemGPSLocation);
 
-            lat = location.getLatitude();
-            lon = location.getLongitude();
+                lat = location.getLatitude();
+                lon = location.getLongitude();
 
-            if (BuildConfig.DEBUG) {
-                Log.d(LT, "Request to publish location " + lon + "," + lat);
-            }
-
-            if (Math.abs(lat - prevLat) < minDistance && Math.abs(lon - prevLon) < minDistance) {
                 if (BuildConfig.DEBUG) {
-                    Log.d(LT, "Skip upload because too close");
+                    Log.d(LT, "Request to publish location " + lon + "," + lat);
                 }
-                return;
-            }
 
-            prevLon = lon;
-            prevLat = lat;
-            notifyFilteredLocation(location);
+                if (Math.abs(lat - prevLat) < minDistance && Math.abs(lon - prevLon) < minDistance) {
+                    if (BuildConfig.DEBUG) {
+                        Log.d(LT, "Skip upload because too close");
+                    }
+                    return;
+                }
+
+                prevLon = lon;
+                prevLat = lat;
+                notifyFilteredLocation(location);
+            }
         }
 
         @Override
@@ -433,7 +436,7 @@ public class Tracker {
 
     public boolean isSuspended;
     public boolean isUpdating;
-    public Watchdog watchdog = new Watchdog();
+    final public Watchdog watchdog = new Watchdog();
 
     private ILocationListener filteredLocationListener;
 

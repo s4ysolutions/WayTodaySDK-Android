@@ -229,6 +229,7 @@ class DataItemAcc extends DataItem {
         return absEastAcc * Math.cos(declination) - absNorthAcc * Math.sin(declination);
     }
 
+    /** @noinspection unused*/
     public double getAbsUpAcc() {
         return absUpAcc;
     }

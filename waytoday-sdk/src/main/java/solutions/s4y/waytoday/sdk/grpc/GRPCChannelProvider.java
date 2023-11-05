@@ -207,9 +207,13 @@ package solutions.s4y.waytoday.sdk.grpc;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.Metadata;
+import io.grpc.stub.MetadataUtils;
 import solutions.s4y.waytoday.sdk.BuildConfig;
+import solutions.s4y.waytoday.sdk.wsse.Wsse;
 
 public class GRPCChannelProvider {
+    private final String secret;
     private final boolean tls;
     private final String host;
     private final int port;
@@ -222,18 +226,26 @@ public class GRPCChannelProvider {
                 .forAddress(host, port);
         if (!tls)
             channelBuilder.usePlaintext();
+
+        Metadata headers = new Metadata();
+        Metadata.Key<String> key = GRPCMetadataKeys.wsseKey;
+        String token = Wsse.getToken(secret);
+        headers.put(key, token);
+        channelBuilder.intercept(MetadataUtils.newAttachHeadersInterceptor(headers));
+
         return channelBuilder.build();
     }
 
-    private GRPCChannelProvider(String host, int port) {
+    private GRPCChannelProvider(String host, int port, String secret) {
         this.host = host;
         this.port = port;
         tls = (port % 1000) > 100;
+        this.secret = secret;
     }
 
-    public static GRPCChannelProvider getInstance() {
+    public static GRPCChannelProvider getInstance(String secret) {
         if (sInstance == null) {
-            sInstance = new GRPCChannelProvider(BuildConfig.GRPC_HOST, BuildConfig.GRPC_PORT);
+            sInstance = new GRPCChannelProvider(BuildConfig.GRPC_HOST, BuildConfig.GRPC_PORT, secret);
         }
         return sInstance;
     }

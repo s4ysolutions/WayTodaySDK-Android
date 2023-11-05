@@ -213,7 +213,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 
 import solutions.s4y.waytoday.sdk.R;
-import solutions.s4y.waytoday.sdk.locations.ILocationUpdater;
 import solutions.s4y.waytoday.sdk.tracker.Tracker;
 
 @SuppressWarnings({"unused", "RedundantSuppression"})

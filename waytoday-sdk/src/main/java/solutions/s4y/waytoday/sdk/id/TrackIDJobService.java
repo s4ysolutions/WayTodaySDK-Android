@@ -223,13 +223,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.grpc.ManagedChannel;
-import io.grpc.Metadata;
-import io.grpc.stub.MetadataUtils;
 import solutions.s4y.waytoday.sdk.errors.ErrorsObservable;
-import solutions.s4y.waytoday.sdk.grpc.GRPCMetadataKeys;
 import solutions.s4y.waytoday.sdk.grpc.TrackerGrpc;
 import solutions.s4y.waytoday.sdk.grpc.TrackerOuterClass;
-import solutions.s4y.waytoday.sdk.wsse.Wsse;
 import solutions.s4y.waytoday.sdk.grpc.GRPCChannelProvider;
 
 /**
@@ -243,7 +239,7 @@ public class TrackIDJobService extends JobIntentService {
     private static boolean sFailed = false;
     private static boolean sProgress = false;
 
-    private final GRPCChannelProvider grpcChannelProvider = GRPCChannelProvider.getInstance();
+    private final GRPCChannelProvider grpcChannelProvider = GRPCChannelProvider.getInstance(secret);
     private ManagedChannel ch = null;
 
     @VisibleForTesting
@@ -371,13 +367,8 @@ public class TrackIDJobService extends JobIntentService {
                 // without destory, te use the channel then
                 if (ch == null)
                     ch = grpcChannelProvider.channel();
-                TrackerGrpc.TrackerBlockingStub grpcStub = getGrpcStub();
 
-                Metadata headers = new Metadata();
-                Metadata.Key<String> key = GRPCMetadataKeys.wsseKey;
-                String token = Wsse.getToken(secret);
-                headers.put(key, token);
-                grpcStub = MetadataUtils.attachHeaders(grpcStub, headers);
+                TrackerGrpc.TrackerBlockingStub grpcStub = getGrpcStub();
 
                 TrackerOuterClass.GenerateTrackerIDRequest req = TrackerOuterClass.
                         GenerateTrackerIDRequest.

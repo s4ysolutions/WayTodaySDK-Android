@@ -208,7 +208,7 @@ package solutions.s4y.waytoday.sdk.tracker;
 import mad.location.manager.lib.Commons.Utils;
 
 public class FilterSettings {
-    public static FilterSettings defaultSettings =
+    final public static FilterSettings defaultSettings =
             new FilterSettings(Utils.ACCELEROMETER_DEFAULT_DEVIATION,
                     Utils.GPS_MIN_DISTANCE, Utils.GPS_MIN_TIME,
                     Utils.GEOHASH_DEFAULT_PREC, Utils.GEOHASH_DEFAULT_MIN_POINT_COUNT,
@@ -219,9 +219,13 @@ public class FilterSettings {
     public final int geoHashMinPointCount;
     public final double mVelFactor;
     public final double mPosFactor;
+    /** @noinspection FieldCanBeLocal*/
     private final int gpsMinDistance;
+    /** @noinspection FieldCanBeLocal*/
     private final int gpsMinTime;
+    /** @noinspection FieldCanBeLocal*/
     private final double sensorFfequencyHz;
+    /** @noinspection FieldCanBeLocal*/
     private final boolean filterMockGpsCoordinates;
 
     public FilterSettings(double accelerationDeviation,

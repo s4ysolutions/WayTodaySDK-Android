@@ -240,9 +240,6 @@ public class DataItemGPS extends DataItem {
         if (declination == NOT_INITIALIZED) {
             long timeStamp;
             timeStamp = Utils.nano2milli(location.getElapsedRealtimeNanos());
-            //WARNING!!! here should be speed accuracy, but loc.hasSpeedAccuracy()
-            // and loc.getSpeedAccuracyMetersPerSecond() requares API 26
-            double velErr = location.getAccuracy() * 0.1;
 
 
             GeomagneticField f = new GeomagneticField(

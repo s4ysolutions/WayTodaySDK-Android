@@ -227,17 +227,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.app.JobIntentService;
 import io.grpc.ManagedChannel;
-import io.grpc.Metadata;
-import io.grpc.stub.MetadataUtils;
 import solutions.s4y.waytoday.sdk.errors.ErrorsObservable;
 import solutions.s4y.waytoday.sdk.grpc.GRPCChannelProvider;
-import solutions.s4y.waytoday.sdk.grpc.GRPCMetadataKeys;
 import solutions.s4y.waytoday.sdk.grpc.LocationOuterClass;
 import solutions.s4y.waytoday.sdk.grpc.TrackerGrpc;
 import solutions.s4y.waytoday.sdk.grpc.TrackerOuterClass;
 import solutions.s4y.waytoday.sdk.BuildConfig;
 import solutions.s4y.waytoday.sdk.utils.Bear;
-import solutions.s4y.waytoday.sdk.wsse.Wsse;
 
 import static solutions.s4y.waytoday.sdk.utils.FConv.i;
 import static java.util.UUID.randomUUID;
@@ -256,7 +252,7 @@ public class UploadJobService extends JobIntentService {
     private final static int MAX_LOCATIONS_MEMORY = 500;
     private final static int PACK_SIZE = 16;
 
-    private final GRPCChannelProvider grpcChannelProvider = GRPCChannelProvider.getInstance();
+    private final GRPCChannelProvider grpcChannelProvider = GRPCChannelProvider.getInstance(secret);
 
     private static boolean sPrevIsError;
     private static boolean sPrevIsUploading;
@@ -477,10 +473,6 @@ public class UploadJobService extends JobIntentService {
                 if (ch == null) ch = grpcChannelProvider.channel();
                 TrackerGrpc.TrackerBlockingStub grpcStub = getGrpcStub();
                 try {
-                    Metadata headers = new Metadata();
-                    headers.put(GRPCMetadataKeys.wsseKey, Wsse.getToken(secret));
-
-                    grpcStub = MetadataUtils.attachHeaders(grpcStub, headers);
                     TrackerOuterClass.AddLocationResponse resp = grpcStub.addLocations(req.build());
                     if (resp.getOk()) {
                         for (int i = 0; i < packSize; i++) {

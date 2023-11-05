@@ -87,7 +87,7 @@ public class Watchdog {
         if (wakeupPIntent != null) {
             alarmManager.cancel(wakeupPIntent);
         }
-        this.wakeupPIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_WATCHDOG), 0);
+        this.wakeupPIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_WATCHDOG), PendingIntent.FLAG_IMMUTABLE);
         if (Build.VERSION.SDK_INT >= 23) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + Math.max(90 * 1000, interval), wakeupPIntent);
         } else {
