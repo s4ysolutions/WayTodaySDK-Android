@@ -17,6 +17,12 @@ import android.util.Log;
 import solutions.s4y.waytoday.sdk.BuildConfig;
 import solutions.s4y.waytoday.sdk.errors.ErrorsObservable;
 
+// TODO: make sure the context is the same for all the calls
+//       - probably it is worth to init it once in the constructor
+//       but there will be a problem with context memory leak
+//       - another approach is to init with Application context
+//       - currently it's a client's problem to manage the same context
+//         for start/stop (implies register/unregister)
 public class Watchdog {
     private final static String LT = Watchdog.class.getSimpleName();
     private final static String ACTION_WATCHDOG = "solutions.s4y.waytoday.WATCHDOG";
