@@ -1,3 +1,0 @@
-[submodule "waytoday-sdk/src/main/proto"]
-	path = waytoday-sdk/src/main/proto
-	url = git@github.com:s4ysolutions/WayTodayProtobuffers.git
