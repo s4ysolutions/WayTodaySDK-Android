@@ -6,7 +6,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:8.1.2"
+        classpath "com.android.tools.build:gradle:8.1.4"
+        // classpath "com.getkeepsafe.dexcount:dexcount-gradle-plugin:3.0.0"
         // used id syntax
         // classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.13'
 
@@ -17,6 +18,7 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenLocal()
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }

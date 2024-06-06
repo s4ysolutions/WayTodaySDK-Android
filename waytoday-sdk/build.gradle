@@ -1,9 +1,11 @@
 plugins {
     id 'com.android.library'
-    id 'com.google.protobuf' version '0.9.4'
+    // id 'com.google.protobuf' version '0.9.4'
     id 'maven-publish'
     // id 'signing'
 }
+
+// apply plugin: 'com.getkeepsafe.dexcount'
 
 android {
     namespace = 'solutions.s4y.waytoday.sdk'
@@ -35,15 +37,9 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
-            buildConfigField "int", "GRPC_PORT", "9101"
-            buildConfigField "int", "GRPC_PORT_PLAIN", "9001"
-            buildConfigField "String", "GRPC_HOST", "\"tracker.way.today\""
         }
         release {
-            minifyEnabled false
-            buildConfigField "int", "GRPC_PORT", "9101"
-            buildConfigField "int", "GRPC_PORT_PLAIN", "9001"
-            buildConfigField "String", "GRPC_HOST", "\"tracker.way.today\""
+            minifyEnabled true
         }
     }
 
@@ -63,40 +59,16 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
     implementation 'androidx.preference:preference:1.2.1'
-    implementation 'io.grpc:grpc-protobuf-lite:1.59.0'
-    implementation 'io.grpc:grpc-stub:1.59.0'
-    implementation 'io.grpc:grpc-okhttp:1.59.0'
-    implementation 'com.github.maddevsio:mad-location-manager:0.1.16'
-
+    implementation "androidx.work:work-runtime:2.9.0"
+    implementation 'com.github.s4ysolutions:WayTodaySDK-Java:82c2368780'
+/*
     testImplementation 'androidx.test.ext:junit:1.1.5'
     testImplementation 'com.google.truth:truth:1.1.5'
     testImplementation 'org.robolectric:robolectric:4.11.1'
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-}
-
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:3.25.0"
-    }
-    plugins {
-        grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.59.0'
-        }
-    }
-    generateProtoTasks {
-        all().each { task ->
-            task.builtins {
-                java { option 'lite' }
-            }
-            task.plugins {
-                grpc { // Options added to --grpc_out
-                    option 'lite'
-                }
-            }
-        }
-    }
+ */
 }
 
 task javaSourcesJar(type: Jar) {
