@@ -4,7 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-public class PreferencesPersistedState implements IPersistedState {
+ class PreferencesPersistedState implements IPersistedState {
     final private Context context;
 
     public PreferencesPersistedState(Context context) {
@@ -28,8 +28,8 @@ public class PreferencesPersistedState implements IPersistedState {
                 .apply();
     }
 
-    @Override
-    public boolean isTrackerIDSet() {
-        return !getTrackerId().isEmpty();
+     @Override
+     public boolean hasTrackerId() {
+         return !getTrackerId().isEmpty();
     }
 }

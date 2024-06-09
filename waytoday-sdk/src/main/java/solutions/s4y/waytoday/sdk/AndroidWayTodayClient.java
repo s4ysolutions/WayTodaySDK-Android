@@ -5,6 +5,8 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.Operation;
+import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -60,8 +62,17 @@ public class AndroidWayTodayClient {
         return new OneTimeWorkRequest.Builder(RequestTrackIdWorker.class).build();
     }
 
+    public Operation enqueueTrackIdWorkRequest(Context context) {
+        OneTimeWorkRequest request = createUploadLocationsWorker();
+        return WorkManager.getInstance(context).enqueue(request);
+    }
+
     public OneTimeWorkRequest createUploadLocationsWorker() {
         return new OneTimeWorkRequest.Builder(UploadLocationsWorker.class).build();
     }
 
+    public Operation enqueueUploadLocationsWorkRequest(Context context) {
+        OneTimeWorkRequest request = createUploadLocationsWorker();
+        return WorkManager.getInstance(context).enqueue(request);
+    }
 }
