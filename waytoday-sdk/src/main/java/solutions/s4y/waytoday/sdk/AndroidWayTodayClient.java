@@ -20,6 +20,7 @@ import kotlin.Unit;
 import s4y.gps.sdk.GPSUpdate;
 import s4y.gps.sdk.GPSUpdatesManager;
 import s4y.gps.sdk.android.GPSPowerManager;
+import s4y.gps.sdk.android.GPSPreferences;
 import s4y.gps.sdk.android.implementation.FusedGPSUpdatesProvider;
 import s4y.gps.sdk.dependencies.IGPSUpdatesProvider;
 
@@ -35,7 +36,7 @@ public class AndroidWayTodayClient implements Closeable {
 
     private final String provider;
     private final Context context;
-    private final PreferenceOn trackingOn;
+    private final GPSPreferences gpsPreferences;
 
     private static final HashMap<String, WayTodayClient> clients = new HashMap<>();
 
@@ -46,7 +47,7 @@ public class AndroidWayTodayClient implements Closeable {
     public AndroidWayTodayClient(Context context, String principal, String secret, boolean tls, String host, int port, String provider, Looper looper) {
         this.context = context;
         this.provider = provider;
-        trackingOn = new PreferenceOn(context);
+        gpsPreferences = new GPSPreferences(context);
 
         powerManager = new GPSPowerManager(context);
 
@@ -58,7 +59,7 @@ public class AndroidWayTodayClient implements Closeable {
         IGPSUpdatesProvider gpsUpdatesProvider = new FusedGPSUpdatesProvider(context, looper);
         gpsUpdatesManager = new GPSUpdatesManager(gpsUpdatesProvider, 500);
         gpsUpdatesManager.getLast().addListener(this::gpsUpdatesListener);
-        if (trackingOn.get()) {
+        if (gpsPreferences.getKeepAlive()) {
             gpsUpdatesManager.start();
         }
     }
@@ -177,12 +178,8 @@ public class AndroidWayTodayClient implements Closeable {
         return Unit.INSTANCE;
     }
 
-    public boolean isTrackingOn() {
-        return trackingOn.get();
-    }
-
     public void enableTrackingOn() {
-        trackingOn.set(true);
+        gpsPreferences.setKeepAlive(true);
     }
 
     public void turnTrackingOn() {
@@ -191,11 +188,15 @@ public class AndroidWayTodayClient implements Closeable {
     }
 
     public void turnTrackingOff() {
-        this.trackingOn.set(false);
+        gpsPreferences.setKeepAlive(false);
         gpsUpdatesManager.stop();
     }
 
+    public boolean isTrackingOn() {
+        return gpsPreferences.getKeepAlive();
+    }
+
     static public boolean isTrackingOn(Context context) {
-        return new PreferenceOn(context).get();
+        return GPSPreferences.keepAlive(context);
     }
 }
