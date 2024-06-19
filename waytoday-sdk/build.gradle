@@ -28,8 +28,8 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     api "androidx.work:work-runtime:2.9.0"
-    api 'com.github.s4ysolutions:GPSAndroidSDK:3.0.0-alpha2'
-    //api "solutions.s4y.gps:gps-sdk-android:3.0.0-alpha1"
+    api 'com.github.s4ysolutions:GPSAndroidSDK:3.0.1'
+    // api "solutions.s4y.gps:gps-sdk-android:3.0.1"
     api 'com.github.s4ysolutions:WayTodaySDK-Java:3.0.0-alpha1'
     //api "solutions.s4y.waytoday:waytoday-sdk-java:3.0.0-alpha1"
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
@@ -49,7 +49,7 @@ publishing {
         Release(MavenPublication) {
             groupId = 'solutions.s4y.waytoday'
             artifactId = 'waytoday-sdk-android'
-            version = '4.0.0-alpha2'
+            version = '4.0.1'
 
             pom {
                 packaging 'aar'
