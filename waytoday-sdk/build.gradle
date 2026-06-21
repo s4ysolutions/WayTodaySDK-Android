@@ -54,7 +54,7 @@ publishing {
         Release(MavenPublication) {
             groupId = 'solutions.s4y.waytoday'
             artifactId = 'waytoday-sdk-android'
-            version = '4.2.0'
+            version = '4.3.0'
 
             pom {
                 packaging 'aar'
