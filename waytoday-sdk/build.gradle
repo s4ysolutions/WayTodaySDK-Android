@@ -9,7 +9,7 @@ android {
         buildConfig true
     }
 
-    compileSdk 35
+    compileSdk 37
 
     defaultConfig {
         minSdkVersion 19
@@ -33,7 +33,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     api "androidx.work:work-runtime:2.11.2"
-    api 'com.github.s4ysolutions:GPSAndroidSDK:3.2.0'
+    api 'com.github.s4ysolutions:GPSAndroidSDK:3.3.0'
     // api "solutions.s4y.gps:gps-sdk-android:3.2.0"
     api 'com.github.s4ysolutions:WayTodaySDK-Java:3.1.0-alpha1'
     //api "solutions.s4y.waytoday:waytoday-sdk-java:3.0.0-alpha1"
@@ -54,7 +54,7 @@ publishing {
         Release(MavenPublication) {
             groupId = 'solutions.s4y.waytoday'
             artifactId = 'waytoday-sdk-android'
-            version = '4.3.0'
+            version = '4.4.0'
 
             pom {
                 packaging 'aar'
