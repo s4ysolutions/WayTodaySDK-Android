@@ -2,7 +2,7 @@
 
 ## Versions
 
-- This SDK: `4.4.3` (defined by git tag, matches JitPack artifact version)
+- This SDK: `4.4.4` (defined by git tag, matches JitPack artifact version)
 - AGP: `9.2.1` | Gradle: `9.6.0` | compileSdk: `37`
 - Depends on GPSAndroidSDK: `3.3.3`
 - Depends on WayTodaySDK-Java: `3.1.0-alpha1`
@@ -19,7 +19,7 @@
 Artifacts published via JitPack on tag push. Tag must match the publishing version exactly.
 No CI — JitPack builds on first artifact request or via jitpack.io UI.
 
-**Note:** "Publishing" means creating a git tag matching the version (e.g., `4.4.3`) and pushing it. The artifact is then fetched from JitPack, which triggers the build. Build success/failure can be tracked via JitPack logs at `https://jitpack.io/com/github/s4ysolutions/WayTodaySDK-Android/<tag>/build.log`.
+**Note:** "Publishing" means creating a git tag matching the version (e.g., `4.4.4`) and pushing it. The artifact is then fetched from JitPack, which triggers the build. Build success/failure can be tracked via JitPack logs at `https://jitpack.io/com/github/s4ysolutions/WayTodaySDK-Android/<tag>/build.log`.
 Artifact coordinates: `com.github.s4ysolutions:WayTodaySDK-Android:<version>` (tag with no `v` prefix).
 
 ## Compatibility rules

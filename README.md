@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.s4ysolutions:WayTodaySDK-Android:4.4.0'
+    implementation 'com.github.s4ysolutions:WayTodaySDK-Android:4.4.4'
 }
 ```
 
