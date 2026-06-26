@@ -2,7 +2,7 @@
 
 ## Versions
 
-- This SDK: `4.4.2` (waytoday-sdk/build.gradle `publishing.publications.Release.version`)
+- This SDK: `4.4.3` (waytoday-sdk/build.gradle `publishing.publications.Release.version`)
 - AGP: `9.2.1` | Gradle: `9.6.0` | compileSdk: `37`
 - Depends on GPSAndroidSDK: `3.3.3`
 - Depends on WayTodaySDK-Java: `3.1.0-alpha1`
