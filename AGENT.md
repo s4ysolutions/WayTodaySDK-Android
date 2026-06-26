@@ -4,7 +4,7 @@
 
 - This SDK: `4.4.0` (waytoday-sdk/build.gradle `publishing.publications.Release.version`)
 - AGP: `9.2.1` | Gradle: `9.6.0` | compileSdk: `37`
-- Depends on GPSAndroidSDK: `3.3.0`
+- Depends on GPSAndroidSDK: `3.3.1`
 - Depends on WayTodaySDK-Java: `3.1.0-alpha1`
 - Compatible Java SDK: [WayTodaySDK-Java](https://github.com/s4ysolutions/WayTodaySDK-Java) `3.1.0-alpha1`
 
