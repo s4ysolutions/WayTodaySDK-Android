@@ -48,3 +48,17 @@ tasks.register('javaSourcesJar', Jar) {
     preserveFileTimestamps = false
     reproducibleFileOrder = true
 }
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = project.findProperty('group') ?: 'com.github.s4ysolutions'
+            artifactId = project.findProperty('artifactId') ?: project.getName()
+            version = project.findProperty('version') ?: '4.4.4'
+
+            afterEvaluate {
+                from components.release
+            }
+        }
+    }
+}

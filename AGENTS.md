@@ -35,16 +35,15 @@ When bumping this SDK's version alone:
 
 ## Workflows
 
-### deploy to Jitpack
+### publish / deploy
 
-Use when requested to deploy or finalize or publish.
+Use when requested to publish, deploy, finalize, or release.
 
-Steps:
-1. Update `api 'com.github.s4ysolutions:GPSAndroidSDK:<version>'` in `waytoday-sdk/build.gradle`
-2. Update `AGENTS.md` — both the version table and the Depends on line
-3. Bump this SDK's fix version in `waytoday-sdk/build.gradle` (e.g. `4.4.1` → `4.4.2`)
-4. Commit with message `chore: bump GPSAndroidSDK to <version>, SDK to <new-version>`
-5. Create matching tag (e.g. `4.4.2`)
-6. Push branch and tag to origin
-7. Check Jitpack build at `https://jitpack.io/com/github/s4ysolutions/WayTodaySDK-Android/<tag>/build.log`
-8. If JDK version mismatch, add/edit `jitpack.yml` with `openjdk21`
+1. **Push** latest changes to `origin/main`
+2. **Tag** with a fix version bump (e.g. `4.4.4` → `4.4.5`): `git tag 4.4.5 && git push origin 4.4.5`
+3. **Trigger JitPack build** by fetching the artifact: open `https://jitpack.io/#s4ysolutions/WayTodaySDK-Android/<tag>` or `https://jitpack.io/com/github/s4ysolutions/WayTodaySDK-Android/<tag>/build.log`
+4. **Monitor the build log** at `https://jitpack.io/com/github/s4ysolutions/WayTodaySDK-Android/<tag>/build.log`
+5. If **build fails**, fix the issue and repeat from step 1 (push fix → delete old tag → tag new version → trigger → monitor)
+6. If **build succeeds**, artifact is live at `com.github.s4ysolutions:WayTodaySDK-Android:<tag>`
+
+> To delete a failed tag: `git tag -d <tag> && git push origin :refs/tags/<tag>`
